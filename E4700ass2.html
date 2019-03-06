@@ -1,0 +1,886 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>E4700ass2</title><meta name="generator" content="MATLAB 9.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-03-05"><meta name="DC.source" content="E4700ass2.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="comment">%Assignment 2 - Mike Crawford 100952432</span>
+<span class="comment">%part 1 a</span>
+
+<span class="comment">%sets boundary values and empty matrices</span>
+x = 30;
+y = 20;
+
+G = sparse(x*y, x*y);
+V = zeros(x*y, 1);
+
+<span class="comment">%goes through each increment of the canvas grid</span>
+<span class="keyword">for</span> i = 1:x
+    <span class="keyword">for</span> j = 1:y
+        <span class="comment">%assigns variables to each side of the index node</span>
+        n= j + (i - 1)*y;
+        nx1 = j + ((i-1) - 1)*y;
+        nx2 = j + ((i+1) - 1)*y;
+        ny1 = (j-1) + (i - 1)*y;
+        ny2 = (j+1) + (i - 1)*y;
+        <span class="comment">%sets boundary condition for right edge of canvas</span>
+        <span class="keyword">if</span> i == x
+            G(n,:) = 0;
+            G(n,n) = 1;
+          <span class="comment">%sets boundary condition for left edge of canvas</span>
+        <span class="keyword">elseif</span> i == 1
+            G(n,:) = 0;
+            G(n,n) = 1;
+            V(1,n) = 1;
+            <span class="comment">%sets boundary condition for bottom and top edge of canvas</span>
+        <span class="keyword">elseif</span> j == 1 || j == y;
+            G(n,n) = -3;
+            G(n,nx1) = 1;
+            G(n,nx2) = 1;
+            G(n,ny2) = 1;
+        <span class="keyword">else</span>
+            <span class="comment">%sets condition when not hitting any boundaries</span>
+            G(n,n) = -4;
+            G(n,nx1) = 1;
+            G(n, nx2) = 1;
+            G(n, ny1) = 1;
+            G(n, ny2) = 1;
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">%sets up voltage plot</span>
+S = G\V;
+surface = zeros(x,y);
+
+<span class="keyword">for</span> i = 1:x
+    <span class="keyword">for</span> j = 1:y
+        n = j + (i - 1)*y;
+        surface(i,j) = S(n);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+figure(1)
+surf(surface);
+
+<span class="comment">%part 1 b</span>
+
+<span class="comment">%same as part 1 a, except the boundary conditions are slightly changed.</span>
+<span class="comment">%sets boundary values and empty matrices</span>
+x = 30;
+y = 20;
+
+G = sparse(x*y, x*y);
+V = zeros(x*y, 1);
+
+<span class="comment">%goes through each increment of the canvas grid</span>
+<span class="keyword">for</span> i = 1:x
+    <span class="keyword">for</span> j = 1:y
+        <span class="comment">%assigns variables to each side of the index node</span>
+        n= j + (i - 1)*y;
+        nx1 = j + ((i-1) - 1)*y;
+        nx2 = j + ((i+1) - 1)*y;
+        ny1 = (j-1) + (i - 1)*y;
+        ny2 = (j+1) + (i - 1)*y;
+        <span class="comment">%sets boundary condition for right edge of canvas(v =0)</span>
+        <span class="keyword">if</span> i == x
+            G(n,:) = 0;
+            G(n,n) = 1;
+            V(n) = 1;
+          <span class="comment">%sets boundary condition for left edge of canvas(v = Vo)</span>
+        <span class="keyword">elseif</span> i == 1
+            G(n,:) = 0;
+            G(n,n) = 1;
+            V(1,n) = 1;
+            <span class="comment">%sets boundary condition for bottom and top edge of canvas</span>
+        <span class="keyword">elseif</span> j == 1 || j == y;
+            G(n,n) = -3;
+            G(n,nx1) = 1;
+            G(n,nx2) = 1;
+            G(n,ny2) = 1;
+            V(n) = 0;
+        <span class="keyword">else</span>
+            <span class="comment">%sets condition when not hitting any boundaries</span>
+            G(n,n) = -4;
+            G(n,nx1) = 1;
+            G(n, nx2) = 1;
+            G(n, ny1) = 1;
+            G(n, ny2) = 1;
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">%sets up voltage plot</span>
+S = G\V;
+surface = zeros(x,y);
+
+<span class="keyword">for</span> i = 1:x
+    <span class="keyword">for</span> j = 1:y
+        n = j + (i - 1)*y;
+        surface(i,j) = S(n);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+figure(1)
+surf(surface);
+
+<span class="comment">%part 2 a</span>
+
+<span class="comment">%part 2 is set up similar to part 1 with the addition of boxes that had</span>
+<span class="comment">%different capacitance values then outside it. Additionally the final plot</span>
+<span class="comment">%of the voltage will be used to get the gradient and the current density</span>
+
+<span class="comment">%sets boundary values</span>
+x = 30;
+y = 20;
+<span class="comment">%sets empty matrices</span>
+G = sparse(x*y, x*y);
+V = zeros(1, x*y);
+<span class="comment">%sets the two conduction values</span>
+conductOut = 1;
+conductBox = 1e-2;
+<span class="comment">%sets matrix for conduction values</span>
+conduct = zeros(x,y);
+<span class="comment">%assigns conduction values for each part of canvas based off box conditions</span>
+<span class="keyword">for</span> i = 1:x
+    <span class="keyword">for</span> j = 1:y
+        <span class="comment">%sets boundaries of boxes</span>
+        <span class="keyword">if</span> (i &gt; (0.3*x) || i &lt; (0.6*x)) &amp;&amp; (j &gt; (0.6*y) || j &lt; (0.3*y))
+            conduct(i,j) = conductBox;
+        <span class="keyword">else</span>
+            conduct(i,j) = conductOut;
+        <span class="keyword">end</span>
+
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">%goes through each part of grid and assigns variables for the nodes around</span>
+<span class="comment">%the index. Then sets the voltages and conductance values based off the</span>
+<span class="comment">%x and y coordinates</span>
+<span class="keyword">for</span> i = 1:x
+    <span class="keyword">for</span> j = 1:y
+        n = j + (i - 1)*y;
+        nx1 = j + ((i-1) - 1)*y;
+        nx2 = j + ((i+1) - 1)*y;
+        ny1 = (j-1) + (i - 1)*y;
+        ny2 = (j+1) + (i - 1)*y;
+
+        <span class="keyword">if</span> i == 1
+            V(n) = 1;
+            G(n,n) = 1;
+        <span class="keyword">elseif</span> i == x
+            V(n) = 0;
+            G(n,n) =1;
+        <span class="keyword">elseif</span> j == 1 || j == y
+            G(n,n) = -3*conduct(i,j);
+            G(n, nx1) = conduct(i,j);
+            G(n,nx2) = conduct(i,j);
+            G(n, ny2) = conduct(i,j);
+        <span class="keyword">else</span>
+            G(n,n) = -4;
+            G(n,nx1) = conduct(i,j);
+            G(n,nx2) = conduct(i,j);
+            G(n,ny1) = conduct(i,j);
+            G(n,ny2) = conduct(i,j);
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">%divide each spaces capaitance value by the coresponding voltage</span>
+S = G\V';
+
+<span class="comment">%set up matrix holding all the results</span>
+surface = zeros(x,y);
+<span class="keyword">for</span> i = 1:x
+    <span class="keyword">for</span> j = 1:y
+        n = j + (i - 1)*y;
+        surface(i,j) = S(n);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">%plots the surface voltage</span>
+figure(1)
+surf(surface)
+
+<span class="comment">%calculates the x and y values of the gradient</span>
+[Ex, Ey] = gradient(-surface);
+<span class="comment">%finds the total gradient and plots it</span>
+E = sqrt(Ex.^2 + Ey.^2);
+figure(2)
+surf(E)
+<span class="comment">%finds the current densities using the map of conductance values</span>
+Jx = Ex .*conduct;
+Jy = Ey .*conduct;
+<span class="comment">%gets the total current density and plots it</span>
+J = sqrt(Jy.^2 + Jx.^2);
+figure(3)
+surf(J)
+<span class="comment">%plots the map of conductance values</span>
+figure(4)
+surf(conduct)
+
+<span class="comment">%part 2 c</span>
+
+<span class="comment">%part 2 is set up similar to part 1 with the addition of boxes that had</span>
+<span class="comment">%different capacitance values then outside it. Additionally the final plot</span>
+<span class="comment">%of the voltage will be used to get the gradient and the current density</span>
+
+<span class="comment">%sets boundary values</span>
+x = 30;
+y = 20;
+<span class="comment">%sets empty matrices</span>
+G = sparse(x*y, x*y);
+V = zeros(1, x*y);
+J1 = zeros(1, 10);
+<span class="comment">%sets the two conduction values</span>
+conductOut = 1;
+conductBox = 1e-2;
+<span class="comment">%sets matrix for conduction values</span>
+conduct = zeros(x,y);
+<span class="comment">%sets up a bottleneck getting smaller over the increments</span>
+<span class="keyword">for</span> i = 1:10
+    Boxy2 = 0.6 - i*(0.01);
+    Boxy1 = 0.3 + i*(0.01);
+<span class="comment">%assigns conduction values for each part of canvas based off box conditions</span>
+<span class="keyword">for</span> i = 1:x
+    <span class="keyword">for</span> j = 1:y
+        <span class="comment">%sets boundaries of boxes</span>
+        <span class="keyword">if</span> (i &gt; (0.3*x) || i &lt; (0.6*x)) &amp;&amp; (j &gt; (Boxy2*y) || j &lt; (Boxy1*y))
+            conduct(i,j) = conductBox;
+        <span class="keyword">else</span>
+            conduct(i,j) = conductOut;
+        <span class="keyword">end</span>
+
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">%goes through each part of grid and assigns variables for the nodes around</span>
+<span class="comment">%the index. Then sets the voltages and conductance values based off the</span>
+<span class="comment">%x and y coordinates</span>
+<span class="keyword">for</span> i = 1:x
+    <span class="keyword">for</span> j = 1:y
+        n = j + (i - 1)*y;
+        nx1 = j + ((i-1) - 1)*y;
+        nx2 = j + ((i+1) - 1)*y;
+        ny1 = (j-1) + (i - 1)*y;
+        ny2 = (j+1) + (i - 1)*y;
+
+        <span class="keyword">if</span> i == 1
+            V(n) = 1;
+            G(n,n) = 1;
+        <span class="keyword">elseif</span> i == x
+            V(n) = 0;
+            G(n,n) =1;
+        <span class="keyword">elseif</span> j == 1 || j == y
+            G(n,n) = -3*conduct(i,j);
+            G(n, nx1) = conduct(i,j);
+            G(n,nx2) = conduct(i,j);
+            G(n, ny2) = conduct(i,j);
+        <span class="keyword">else</span>
+            G(n,n) = -4;
+            G(n,nx1) = conduct(i,j);
+            G(n,nx2) = conduct(i,j);
+            G(n,ny1) = conduct(i,j);
+            G(n,ny2) = conduct(i,j);
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">%divide each spaces capaitance value by the coresponding voltage</span>
+S = G\V';
+
+<span class="comment">%set up matrix holding all the results</span>
+surface = zeros(x,y);
+<span class="keyword">for</span> i = 1:x
+    <span class="keyword">for</span> j = 1:y
+        n = j + (i - 1)*y;
+        surface(i,j) = S(n);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">%plots the surface voltage</span>
+figure(1)
+surf(surface)
+
+<span class="comment">%calculates the x and y values of the gradient</span>
+[Ex, Ey] = gradient(-surface);
+<span class="comment">%finds the total gradient and plots it</span>
+E = sqrt(Ex.^2 + Ey.^2);
+figure(2)
+surf(E)
+<span class="comment">%finds the current densities using the map of conductance values</span>
+Jx = Ex .*conduct;
+Jy = Ey .*conduct;
+<span class="comment">%gets the total current density and indexes it based off bottleneck value</span>
+<span class="comment">%commented this out so i could publish without errors. Think the problem</span>
+<span class="comment">%could be fixed if separate variable used to sum J's and get avg but</span>
+<span class="comment">%couldnt get it working</span>
+J = sqrt(Jy.^2 + Jx.^2);
+<span class="comment">%J1(i) = sum(J)/(x*y);</span>
+<span class="keyword">end</span>
+<span class="comment">%plots current density for different bottle neck sizes</span>
+<span class="comment">%couldnt get plot to work, pretty sure its due to the way i indexed new</span>
+<span class="comment">%array for bottle neck sizes.</span>
+figure(1)
+<span class="comment">%plot(1:10,J)</span>
+
+
+<span class="comment">%part 2 d</span>
+<span class="comment">%part 2 is set up similar to part 1 with the addition of boxes that had</span>
+<span class="comment">%different capacitance values then outside it. Additionally the final plot</span>
+<span class="comment">%of the voltage will be used to get the gradient and the current density</span>
+
+<span class="comment">%sets boundary values</span>
+x = 30;
+y = 20;
+<span class="comment">%sets empty matrices</span>
+G = sparse(x*y, x*y);
+V = zeros(1, x*y);
+J1 = zeros(1, 10);
+<span class="comment">%sets the two conduction values</span>
+conductOut = 1;
+
+<span class="comment">%sets matrix for conduction values</span>
+conduct = zeros(x,y);
+<span class="comment">%sets up a bottleneck getting smaller over the increments</span>
+<span class="keyword">for</span> i = 1:10
+    conductBox = i*1e-2;
+<span class="comment">%assigns conduction values for each part of canvas based off box conditions</span>
+<span class="keyword">for</span> i = 1:x
+    <span class="keyword">for</span> j = 1:y
+        <span class="comment">%sets boundaries of boxes</span>
+        <span class="keyword">if</span> (i &gt; (0.3*x) || i &lt; (0.6*x)) &amp;&amp; (j &gt; (0.6*y) || j &lt; (0.3*y))
+            conduct(i,j) = conductBox;
+        <span class="keyword">else</span>
+            conduct(i,j) = conductOut;
+        <span class="keyword">end</span>
+
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">%goes through each part of grid and assigns variables for the nodes around</span>
+<span class="comment">%the index. Then sets the voltages and conductance values based off the</span>
+<span class="comment">%x and y coordinates</span>
+<span class="keyword">for</span> i = 1:x
+    <span class="keyword">for</span> j = 1:y
+        n = j + (i - 1)*y;
+        nx1 = j + ((i-1) - 1)*y;
+        nx2 = j + ((i+1) - 1)*y;
+        ny1 = (j-1) + (i - 1)*y;
+        ny2 = (j+1) + (i - 1)*y;
+
+        <span class="keyword">if</span> i == 1
+            V(n) = 1;
+            G(n,n) = 1;
+        <span class="keyword">elseif</span> i == x
+            V(n) = 0;
+            G(n,n) =1;
+        <span class="keyword">elseif</span> j == 1 || j == y
+            G(n,n) = -3*conduct(i,j);
+            G(n, nx1) = conduct(i,j);
+            G(n,nx2) = conduct(i,j);
+            G(n, ny2) = conduct(i,j);
+        <span class="keyword">else</span>
+            G(n,n) = -4;
+            G(n,nx1) = conduct(i,j);
+            G(n,nx2) = conduct(i,j);
+            G(n,ny1) = conduct(i,j);
+            G(n,ny2) = conduct(i,j);
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">%divide each spaces capaitance value by the coresponding voltage</span>
+S = G\V';
+
+<span class="comment">%set up matrix holding all the results</span>
+surface = zeros(x,y);
+<span class="keyword">for</span> i = 1:x
+    <span class="keyword">for</span> j = 1:y
+        n = j + (i - 1)*y;
+        surface(i,j) = S(n);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">%plots the surface voltage</span>
+figure(1)
+surf(surface)
+
+<span class="comment">%calculates the x and y values of the gradient</span>
+[Ex, Ey] = gradient(-surface);
+<span class="comment">%finds the total gradient and plots it</span>
+E = sqrt(Ex.^2 + Ey.^2);
+figure(2)
+surf(E)
+<span class="comment">%finds the current densities using the map of conductance values</span>
+Jx = Ex .*conduct;
+Jy = Ey .*conduct;
+<span class="comment">%gets the total current density and indexes it based off sigma value</span>
+J = sqrt(Jy.^2 + Jx.^2);
+<span class="comment">%J1(i) = sum(J)/(x*y);</span>
+<span class="keyword">end</span>
+<span class="comment">%plots current density for different sigma values.Plot isnt working</span>
+<span class="comment">%because the matrix for sigma values isnt sized properly</span>
+figure(1)
+<span class="comment">%plot(1:10,J1)</span>
+</pre><img vspace="5" hspace="5" src="E4700ass2_01.png" alt=""> <img vspace="5" hspace="5" src="E4700ass2_02.png" alt=""> <img vspace="5" hspace="5" src="E4700ass2_03.png" alt=""> <img vspace="5" hspace="5" src="E4700ass2_04.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2018a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%Assignment 2 - Mike Crawford 100952432
+%part 1 a
+
+%sets boundary values and empty matrices 
+x = 30;
+y = 20;
+
+G = sparse(x*y, x*y);
+V = zeros(x*y, 1);
+
+%goes through each increment of the canvas grid
+for i = 1:x
+    for j = 1:y
+        %assigns variables to each side of the index node 
+        n= j + (i - 1)*y;
+        nx1 = j + ((i-1) - 1)*y;
+        nx2 = j + ((i+1) - 1)*y;
+        ny1 = (j-1) + (i - 1)*y;
+        ny2 = (j+1) + (i - 1)*y;
+        %sets boundary condition for right edge of canvas
+        if i == x
+            G(n,:) = 0;
+            G(n,n) = 1;
+          %sets boundary condition for left edge of canvas   
+        elseif i == 1
+            G(n,:) = 0;
+            G(n,n) = 1;
+            V(1,n) = 1;
+            %sets boundary condition for bottom and top edge of canvas
+        elseif j == 1 || j == y;
+            G(n,n) = -3;
+            G(n,nx1) = 1;
+            G(n,nx2) = 1;
+            G(n,ny2) = 1;
+        else
+            %sets condition when not hitting any boundaries
+            G(n,n) = -4;
+            G(n,nx1) = 1;
+            G(n, nx2) = 1;
+            G(n, ny1) = 1;
+            G(n, ny2) = 1;
+        end
+    end
+end
+%sets up voltage plot
+S = G\V;
+surface = zeros(x,y);
+
+for i = 1:x
+    for j = 1:y
+        n = j + (i - 1)*y;
+        surface(i,j) = S(n);
+    end
+end
+figure(1)
+surf(surface);
+            
+%part 1 b
+
+%same as part 1 a, except the boundary conditions are slightly changed.
+%sets boundary values and empty matrices 
+x = 30;
+y = 20;
+
+G = sparse(x*y, x*y);
+V = zeros(x*y, 1);
+
+%goes through each increment of the canvas grid
+for i = 1:x
+    for j = 1:y
+        %assigns variables to each side of the index node 
+        n= j + (i - 1)*y;
+        nx1 = j + ((i-1) - 1)*y;
+        nx2 = j + ((i+1) - 1)*y;
+        ny1 = (j-1) + (i - 1)*y;
+        ny2 = (j+1) + (i - 1)*y;
+        %sets boundary condition for right edge of canvas(v =0)
+        if i == x
+            G(n,:) = 0;
+            G(n,n) = 1;
+            V(n) = 1;
+          %sets boundary condition for left edge of canvas(v = Vo)  
+        elseif i == 1
+            G(n,:) = 0;
+            G(n,n) = 1;
+            V(1,n) = 1;
+            %sets boundary condition for bottom and top edge of canvas
+        elseif j == 1 || j == y;
+            G(n,n) = -3;
+            G(n,nx1) = 1;
+            G(n,nx2) = 1;
+            G(n,ny2) = 1;
+            V(n) = 0;
+        else
+            %sets condition when not hitting any boundaries
+            G(n,n) = -4;
+            G(n,nx1) = 1;
+            G(n, nx2) = 1;
+            G(n, ny1) = 1;
+            G(n, ny2) = 1;
+        end
+    end
+end
+%sets up voltage plot
+S = G\V;
+surface = zeros(x,y);
+
+for i = 1:x
+    for j = 1:y
+        n = j + (i - 1)*y;
+        surface(i,j) = S(n);
+    end
+end
+figure(1)
+surf(surface);
+
+%part 2 a
+
+%part 2 is set up similar to part 1 with the addition of boxes that had
+%different capacitance values then outside it. Additionally the final plot
+%of the voltage will be used to get the gradient and the current density
+
+%sets boundary values
+x = 30;
+y = 20;
+%sets empty matrices
+G = sparse(x*y, x*y);
+V = zeros(1, x*y);
+%sets the two conduction values
+conductOut = 1;
+conductBox = 1e-2;
+%sets matrix for conduction values
+conduct = zeros(x,y);
+%assigns conduction values for each part of canvas based off box conditions
+for i = 1:x
+    for j = 1:y
+        %sets boundaries of boxes
+        if (i > (0.3*x) || i < (0.6*x)) && (j > (0.6*y) || j < (0.3*y))
+            conduct(i,j) = conductBox;
+        else
+            conduct(i,j) = conductOut;
+        end
+        
+    end
+end
+%goes through each part of grid and assigns variables for the nodes around
+%the index. Then sets the voltages and conductance values based off the 
+%x and y coordinates
+for i = 1:x
+    for j = 1:y
+        n = j + (i - 1)*y;
+        nx1 = j + ((i-1) - 1)*y;
+        nx2 = j + ((i+1) - 1)*y;
+        ny1 = (j-1) + (i - 1)*y;
+        ny2 = (j+1) + (i - 1)*y;
+        
+        if i == 1
+            V(n) = 1;
+            G(n,n) = 1;
+        elseif i == x
+            V(n) = 0;
+            G(n,n) =1;
+        elseif j == 1 || j == y
+            G(n,n) = -3*conduct(i,j);
+            G(n, nx1) = conduct(i,j);
+            G(n,nx2) = conduct(i,j);
+            G(n, ny2) = conduct(i,j);
+        else
+            G(n,n) = -4;
+            G(n,nx1) = conduct(i,j);
+            G(n,nx2) = conduct(i,j);
+            G(n,ny1) = conduct(i,j);
+            G(n,ny2) = conduct(i,j);
+        end
+    end
+end
+%divide each spaces capaitance value by the coresponding voltage
+S = G\V';
+
+%set up matrix holding all the results
+surface = zeros(x,y);
+for i = 1:x
+    for j = 1:y
+        n = j + (i - 1)*y;
+        surface(i,j) = S(n);
+    end
+end
+%plots the surface voltage
+figure(1)
+surf(surface)
+
+%calculates the x and y values of the gradient
+[Ex, Ey] = gradient(-surface);
+%finds the total gradient and plots it
+E = sqrt(Ex.^2 + Ey.^2);
+figure(2)
+surf(E)
+%finds the current densities using the map of conductance values
+Jx = Ex .*conduct;
+Jy = Ey .*conduct;
+%gets the total current density and plots it
+J = sqrt(Jy.^2 + Jx.^2);
+figure(3)
+surf(J)
+%plots the map of conductance values
+figure(4)
+surf(conduct)
+            
+%part 2 c
+
+%part 2 is set up similar to part 1 with the addition of boxes that had
+%different capacitance values then outside it. Additionally the final plot
+%of the voltage will be used to get the gradient and the current density
+
+%sets boundary values
+x = 30;
+y = 20;
+%sets empty matrices
+G = sparse(x*y, x*y);
+V = zeros(1, x*y);
+J1 = zeros(1, 10);
+%sets the two conduction values
+conductOut = 1;
+conductBox = 1e-2;
+%sets matrix for conduction values
+conduct = zeros(x,y);
+%sets up a bottleneck getting smaller over the increments
+for i = 1:10
+    Boxy2 = 0.6 - i*(0.01);
+    Boxy1 = 0.3 + i*(0.01);
+%assigns conduction values for each part of canvas based off box conditions
+for i = 1:x
+    for j = 1:y
+        %sets boundaries of boxes
+        if (i > (0.3*x) || i < (0.6*x)) && (j > (Boxy2*y) || j < (Boxy1*y))
+            conduct(i,j) = conductBox;
+        else
+            conduct(i,j) = conductOut;
+        end
+        
+    end
+end
+%goes through each part of grid and assigns variables for the nodes around
+%the index. Then sets the voltages and conductance values based off the 
+%x and y coordinates
+for i = 1:x
+    for j = 1:y
+        n = j + (i - 1)*y;
+        nx1 = j + ((i-1) - 1)*y;
+        nx2 = j + ((i+1) - 1)*y;
+        ny1 = (j-1) + (i - 1)*y;
+        ny2 = (j+1) + (i - 1)*y;
+        
+        if i == 1
+            V(n) = 1;
+            G(n,n) = 1;
+        elseif i == x
+            V(n) = 0;
+            G(n,n) =1;
+        elseif j == 1 || j == y
+            G(n,n) = -3*conduct(i,j);
+            G(n, nx1) = conduct(i,j);
+            G(n,nx2) = conduct(i,j);
+            G(n, ny2) = conduct(i,j);
+        else
+            G(n,n) = -4;
+            G(n,nx1) = conduct(i,j);
+            G(n,nx2) = conduct(i,j);
+            G(n,ny1) = conduct(i,j);
+            G(n,ny2) = conduct(i,j);
+        end
+    end
+end
+%divide each spaces capaitance value by the coresponding voltage
+S = G\V';
+
+%set up matrix holding all the results
+surface = zeros(x,y);
+for i = 1:x
+    for j = 1:y
+        n = j + (i - 1)*y;
+        surface(i,j) = S(n);
+    end
+end
+%plots the surface voltage
+figure(1)
+surf(surface)
+
+%calculates the x and y values of the gradient
+[Ex, Ey] = gradient(-surface);
+%finds the total gradient and plots it
+E = sqrt(Ex.^2 + Ey.^2);
+figure(2)
+surf(E)
+%finds the current densities using the map of conductance values
+Jx = Ex .*conduct;
+Jy = Ey .*conduct;
+%gets the total current density and indexes it based off bottleneck value
+%commented this out so i could publish without errors. Think the problem
+%could be fixed if separate variable used to sum J's and get avg but 
+%couldnt get it working
+J = sqrt(Jy.^2 + Jx.^2);
+%J1(i) = sum(J)/(x*y);
+end
+%plots current density for different bottle neck sizes
+%couldnt get plot to work, pretty sure its due to the way i indexed new
+%array for bottle neck sizes. 
+figure(1)
+%plot(1:10,J)
+
+            
+%part 2 d
+%part 2 is set up similar to part 1 with the addition of boxes that had
+%different capacitance values then outside it. Additionally the final plot
+%of the voltage will be used to get the gradient and the current density
+
+%sets boundary values
+x = 30;
+y = 20;
+%sets empty matrices
+G = sparse(x*y, x*y);
+V = zeros(1, x*y);
+J1 = zeros(1, 10);
+%sets the two conduction values
+conductOut = 1;
+
+%sets matrix for conduction values
+conduct = zeros(x,y);
+%sets up a bottleneck getting smaller over the increments
+for i = 1:10
+    conductBox = i*1e-2;
+%assigns conduction values for each part of canvas based off box conditions
+for i = 1:x
+    for j = 1:y
+        %sets boundaries of boxes
+        if (i > (0.3*x) || i < (0.6*x)) && (j > (0.6*y) || j < (0.3*y))
+            conduct(i,j) = conductBox;
+        else
+            conduct(i,j) = conductOut;
+        end
+        
+    end
+end
+%goes through each part of grid and assigns variables for the nodes around
+%the index. Then sets the voltages and conductance values based off the 
+%x and y coordinates
+for i = 1:x
+    for j = 1:y
+        n = j + (i - 1)*y;
+        nx1 = j + ((i-1) - 1)*y;
+        nx2 = j + ((i+1) - 1)*y;
+        ny1 = (j-1) + (i - 1)*y;
+        ny2 = (j+1) + (i - 1)*y;
+        
+        if i == 1
+            V(n) = 1;
+            G(n,n) = 1;
+        elseif i == x
+            V(n) = 0;
+            G(n,n) =1;
+        elseif j == 1 || j == y
+            G(n,n) = -3*conduct(i,j);
+            G(n, nx1) = conduct(i,j);
+            G(n,nx2) = conduct(i,j);
+            G(n, ny2) = conduct(i,j);
+        else
+            G(n,n) = -4;
+            G(n,nx1) = conduct(i,j);
+            G(n,nx2) = conduct(i,j);
+            G(n,ny1) = conduct(i,j);
+            G(n,ny2) = conduct(i,j);
+        end
+    end
+end
+%divide each spaces capaitance value by the coresponding voltage
+S = G\V';
+
+%set up matrix holding all the results
+surface = zeros(x,y);
+for i = 1:x
+    for j = 1:y
+        n = j + (i - 1)*y;
+        surface(i,j) = S(n);
+    end
+end
+%plots the surface voltage
+figure(1)
+surf(surface)
+
+%calculates the x and y values of the gradient
+[Ex, Ey] = gradient(-surface);
+%finds the total gradient and plots it
+E = sqrt(Ex.^2 + Ey.^2);
+figure(2)
+surf(E)
+%finds the current densities using the map of conductance values
+Jx = Ex .*conduct;
+Jy = Ey .*conduct;
+%gets the total current density and indexes it based off sigma value
+J = sqrt(Jy.^2 + Jx.^2);
+%J1(i) = sum(J)/(x*y);
+end
+%plots current density for different sigma values.Plot isnt working 
+%because the matrix for sigma values isnt sized properly
+figure(1)
+%plot(1:10,J1)
+
+            
+##### SOURCE END #####
+--></body></html>
